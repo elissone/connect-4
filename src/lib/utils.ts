@@ -18,3 +18,21 @@ export const useMousePosition = () => {
   }, []);
   return mousePosition;
 };
+
+type MouseClickHandler = (event: MouseEvent) => void;
+
+export function useMouseClick(handler: MouseClickHandler) {
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      handler(event);
+    };
+
+    // Add event listener
+    window.addEventListener('mousedown', handleClick);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('mousedown', handleClick);
+    };
+  }, [handler]); // Dependency array to ensure the effect is updated only when handler changes
+}

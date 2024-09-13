@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Ref } from "react";
+import { ForwardedRef, Ref, forwardRef } from "react";
 
 export type FichaColor = 'red' | 'yellow' | null;
 
@@ -9,10 +9,10 @@ interface FichaProps {
   refVal?: Ref<HTMLDivElement>
 }
 
-export const Ficha = ({ className, refVal, type }: FichaProps) => {
+export const Ficha = forwardRef(({ className, type }: FichaProps, ref: ForwardedRef<HTMLDivElement>) => {
   return (
     <div
-      ref={refVal}
+      ref={ref}
       className={
         clsx(
           {
@@ -24,7 +24,7 @@ export const Ficha = ({ className, refVal, type }: FichaProps) => {
         )
       }
     />
-  )  
-}
+  )
+});
 
 export default Ficha;

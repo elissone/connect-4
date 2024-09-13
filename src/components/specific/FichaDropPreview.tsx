@@ -1,16 +1,14 @@
-import Ficha, { FichaColor } from "@/components/specific/Ficha";
+import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useMousePosition } from "@/lib/utils";
+import { useMouseClick, useMousePosition } from "@/lib/utils";
+import { useGameContext } from "@/App";
 
-interface FichaDropPreviewProps {
-  columnSize: number;
-  currentTurn: FichaColor;
-}
+export const FichaDropPreview = () => {
 
-export const FichaDropPreview = ({ columnSize, currentTurn }: FichaDropPreviewProps) => {
+  const { boardModel, updateBoard, currentTurn } = useGameContext();
 
-  const indeces = Array.from({length: columnSize}).map((_, i) => i);
+  const indeces = Array.from({length: boardModel.length}).map((_, i) => i);
 
   const [currentIdx, setCurrentIdx] = useState<number>(-1);
   const fichaRefs = indeces.map(() => useRef<HTMLDivElement>(null));
@@ -41,19 +39,24 @@ export const FichaDropPreview = ({ columnSize, currentTurn }: FichaDropPreviewPr
       }
     })
   }, [mousePos.x]);
+
+  useMouseClick((_) => currentIdx !== -1 && currentTurn !== null
+    ? updateBoard(currentIdx, currentTurn)
+    : undefined
+  );
   
   return (
     <div className="flex flex-auto justify-center">
       <div className="grid grid-cols-6">
         { indeces.map( 
-          (i) => <Ficha
-            refVal={fichaRefs[i]}
-            className={clsx({
-              'invisible': i !== currentIdx || currentIdx === -1
-            })}
-            key={i}
-            type={currentTurn}
-          />
+          (i) => (
+            <Ficha
+              ref={fichaRefs[i]}
+              className={clsx({ 'invisible': i !== currentIdx || currentIdx === -1 })}
+              key={i}
+              type={currentTurn}
+            />
+          )
         )}
       </div>
     </div>

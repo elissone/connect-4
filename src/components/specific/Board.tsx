@@ -1,32 +1,15 @@
-import { useMemo, useState } from 'react';
-import Ficha, { FichaColor } from '@/components/specific/Ficha';
+import Ficha from '@/components/specific/Ficha';
+import { useGameContext } from '@/App';
 
-type FichaID = [number, number]
+export const Board = () => {
 
-interface BoardProps { boardDimensions: { row: number, col: number }; }
-
-export const Board = ({ boardDimensions }: BoardProps) => {
-
-  const [board, setBoard] = useState<Map<FichaID, FichaColor>>(
-    new Map<FichaID, FichaColor>()
-  );
-
-  const indeces = useMemo(
-    () => {
-      setBoard(new Map<FichaID, FichaColor>())
-      return {
-        row: Array.from({length: boardDimensions.row}).map((_, i) => i),
-        col: Array.from({length: boardDimensions.col}).map((_, i) => i),
-      };
-    },
-    [boardDimensions]
-  );
+  const gameContext = useGameContext()
 
   return (
     <div className='flex flex-auto justify-center mt-25'>
-      { indeces.row.map( (i) => (
+      { gameContext.boardModel.map( (r, i) => (
         <div key={i} className='grid grid-rows-6'>
-          { indeces.col.map((j) => <Ficha key={`${i}-${j}`} type={board.get([i, j]) ?? null}/>) }
+          { r.map((_, j) => <Ficha key={`${i}-${j}`} type={gameContext.boardModel[j][i]}/>) }
         </div>
       ))}
     </div>
