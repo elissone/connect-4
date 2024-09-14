@@ -6,7 +6,7 @@ import { useGameContext } from "@/App";
 
 export const FichaDropPreview = () => {
 
-  const { boardModel, updateBoard, currentTurn } = useGameContext();
+  const { boardModel, updateBoard, currentTurn, setCurrentTurn } = useGameContext();
 
   const indeces = Array.from({length: boardModel.length}).map((_, i) => i);
 
@@ -40,9 +40,12 @@ export const FichaDropPreview = () => {
     })
   }, [mousePos.x]);
 
-  useMouseClick((_) => currentIdx !== -1 && currentTurn !== null
-    ? updateBoard(currentIdx, currentTurn)
-    : undefined
+  useMouseClick((_) => {
+    currentIdx !== -1 && currentTurn !== null
+      ? updateBoard(currentIdx, currentTurn)
+      : undefined;
+    setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
+    }
   );
   
   return (
