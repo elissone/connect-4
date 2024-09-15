@@ -1,9 +1,9 @@
 import Ficha from '@/components/specific/Ficha';
-import { useGameContext } from '@/App';
+import { useGame } from '@/components/util/GameProvider';
 
 export const Board = () => {
 
-  const { boardModel } = useGameContext()
+  const { boardModel } = useGame();
 
   return (
     <div className='flex flex-auto justify-center mt-25'>

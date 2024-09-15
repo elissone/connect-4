@@ -2,11 +2,10 @@ import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMouseClick, useMousePosition } from "@/lib/utils";
-import { useGameContext } from "@/App";
+import { useGame } from "@/components/util/GameProvider";
 
 export const FichaDropPreview = () => {
-
-  const { boardModel, updateBoard, currentTurn, setCurrentTurn } = useGameContext();
+  const { winner, boardModel, updateBoard, currentTurn, setCurrentTurn } = useGame();
 
   const indeces = Array.from({length: boardModel.length}).map((_, i) => i);
 
@@ -26,6 +25,10 @@ export const FichaDropPreview = () => {
 
   useEffect(() => {
     if (!mousePos.x) return; 
+    if (winner) {
+      setCurrentIdx(-1);
+      return;
+    }
     const leftMost = fichaArrayVerticalBounds?.[0];
     const rigthMost = fichaArrayVerticalBounds?.[fichaArrayVerticalBounds.length - 1];
     if (!leftMost || !rigthMost) return;
@@ -41,10 +44,9 @@ export const FichaDropPreview = () => {
   }, [mousePos.x]);
 
   useMouseClick((_) => {
-    currentIdx !== -1 && currentTurn !== null
-      ? updateBoard(currentIdx, currentTurn)
-      : undefined;
-    setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
+    if (currentIdx === -1 || winner) return;
+      currentTurn !== null ? updateBoard(currentIdx, currentTurn) : undefined;
+      setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
     }
   );
   
