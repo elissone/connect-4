@@ -1,4 +1,4 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { FichaColor } from "@/components/specific/Ficha";
 
 interface GameContextValues {
@@ -128,5 +128,7 @@ export const useGame = () => {
   if (gameContext === undefined)
   throw new Error("useGame must be used within a GameProvider")
 
+
+  useEffect(() => console.log(gameContext.winner), [gameContext.winner]);
   return gameContext;
 };
