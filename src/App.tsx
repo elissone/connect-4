@@ -4,7 +4,7 @@ import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import WinnerSection from '@/components/specific/WinnerSection';
 import { ThemeProvider } from './components/util/ThemeProvider';
 import { ThemeToggle } from './components/util/ThemeToggle';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 
 import { GameProvider } from '@/components/util/GameProvider';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ export const App = () => {
   return (
     <div>
       <ThemeProvider storageKey='vite-ui-theme'>
-        <div className='text-4xl mt-5 mb-20'> babo connect 4</div>
+        <div className='text-6xl font-[700] italic mt-5 mb-20'>Connect Babo</div>
         <Card>
           <GameProvider
             boardDimensions={boardDimensions}

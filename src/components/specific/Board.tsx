@@ -10,7 +10,7 @@ export const Board = ({ className }: {className?: string}) => {
       <div className='flex flex-auto justify-center mt-25'>
         { boardModel.map( (col, c) => (
           <div key={c} className='grid grid-rows-6'>
-            { col.map((_row, r) => <Ficha key={`${c}-${r}`} type={boardModel[c][r]}/>) }
+            { col.map((_row, r) => <Ficha border key={`${c}-${r}`} type={boardModel[c][r]}/>) }
           </div>
         ))}
       </div>
