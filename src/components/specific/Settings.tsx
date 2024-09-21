@@ -45,19 +45,14 @@ export const SettingsDialog = () => {
       value={ theme }
       onValueChange={ setTheme }
     >
-      <ToggleGroupItem value='light'><Sun/></ToggleGroupItem>
-      <ToggleGroupItem value='dark'><Moon/></ToggleGroupItem>
-      <ToggleGroupItem value='system'><Laptop/></ToggleGroupItem>
+      <ToggleGroupItem disabled={ theme === 'light' } value='light'><Sun/></ToggleGroupItem>
+      <ToggleGroupItem disabled={ theme === 'dark' } value='dark'><Moon/></ToggleGroupItem>
+      <ToggleGroupItem disabled={ theme === 'system' } value='system'><Laptop/></ToggleGroupItem>
     </ToggleGroup>
   </>
 
   const setDim = (axis: 'row' | 'col', e: React.ChangeEvent<HTMLInputElement>) => 
-    setBoardDimensions({...boardDimensions, [axis]: parseInt(e.target.value, 10)})
-
-  const getMinAxisLen = (axis: 'row' | 'col') => {
-    const otherAxis = axis === 'row' ? 'col' : 'row';
-    return boardDimensions[otherAxis] <= connectionLength ? connectionLength : 2;
-  }
+    setBoardDimensions({...boardDimensions, [axis]: parseInt(e.target.value, 10)});
 
   const minAxisLen = useMemo(
     () => ({

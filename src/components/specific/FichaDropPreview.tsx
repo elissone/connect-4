@@ -4,7 +4,12 @@ import { createRef, MutableRefObject, useEffect, useMemo, useState } from "react
 import { useMouseClick, useMousePosition } from "@/lib/utils";
 import { useGame } from "@/components/util/GameProvider";
 
-export const FichaDropPreview = () => {
+interface FichaDropPreviewProps {
+  className?: string;
+  fichaSize: number ;
+}
+
+export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreviewProps) => {
   const { winner, boardModel, updateBoard, currentTurn, setCurrentTurn, gameLostFocus }
     = useGame();
 
@@ -19,11 +24,9 @@ export const FichaDropPreview = () => {
   );
 
   useEffect(
-    () => {
-      setFichaRefs(
-        indeces.map( (_, i) => fichaRefs[i] || createRef() )
-      );
-    }, [indeces]
+    () => setFichaRefs(
+      indeces.map( (_, i) => fichaRefs[i] || createRef() )
+    ), [indeces]
   );
 
   const fichaArrayVerticalBounds = useMemo(
@@ -67,19 +70,23 @@ export const FichaDropPreview = () => {
   );
   
   return (
-    <div className="flex flex-auto justify-center">
-      <div className="grid grid-cols-6">
-        { indeces.map( 
-          (i) => (
-            <Ficha
-              key={i}
-              ref={ fichaRefs[i] ?? undefined }
-              className={clsx({ 'invisible': i !== currentIdx || currentIdx === -1 || gameLostFocus})}
-              type={currentTurn}
-            />
-          )
-        )}
-      </div>
+    <div className={clsx({
+      [className]: className !== '',
+      ['grid grid-flow-col border-2 rounded-2xl']: true,
+      ['border-stone-800 hover:border-stone-500']: true
+      })}
+    >
+      { indeces.map( 
+        (i) => (
+          <Ficha
+            key={i}
+            size={ fichaSize }
+            ref={ fichaRefs[i] ?? undefined }
+            className={clsx({ 'invisible': i !== currentIdx || currentIdx === -1 || gameLostFocus})}
+            type={currentTurn}
+          />
+        )
+      )}
     </div>
   );
 };
