@@ -1,24 +1,38 @@
 import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createRef, MutableRefObject, useEffect, useMemo, useState } from "react";
 import { useMouseClick, useMousePosition } from "@/lib/utils";
 import { useGame } from "@/components/util/GameProvider";
 
 export const FichaDropPreview = () => {
-  const { winner, boardModel, updateBoard, currentTurn, setCurrentTurn } = useGame();
+  const { winner, boardModel, updateBoard, currentTurn, setCurrentTurn, gameLostFocus }
+    = useGame();
 
-  const indeces = Array.from({length: boardModel.length}).map((_, i) => i);
+  const indeces = useMemo(
+    () => Array.from({length: boardModel.length}).map((_, i) => i),
+    [boardModel]
+  );
 
   const [currentIdx, setCurrentIdx] = useState<number>(-1);
-  const fichaRefs = indeces.map(() => useRef<HTMLDivElement>(null));
+  const [fichaRefs, setFichaRefs] = useState<MutableRefObject<HTMLDivElement | null>[]>(
+    indeces.map(() => createRef())
+  );
+
+  useEffect(
+    () => {
+      setFichaRefs(
+        indeces.map( (_, i) => fichaRefs[i] || createRef() )
+      );
+    }, [indeces]
+  );
 
   const fichaArrayVerticalBounds = useMemo(
-    () => fichaRefs.map((ref) => {
-      const { left, right } = ref?.current?.getBoundingClientRect() ?? {};
+    () => indeces.map((i) => {
+      const { left, right } = fichaRefs[i].current?.getBoundingClientRect() ?? {};
       if (!left || !right) return;
       return { left, right };
     }),
-    [indeces]
+    [fichaRefs]
   );
 
   const mousePos = useMousePosition();
@@ -44,8 +58,10 @@ export const FichaDropPreview = () => {
   }, [mousePos.x]);
 
   useMouseClick((_) => {
-    if (currentIdx === -1 || winner) return;
-      currentTurn !== null ? updateBoard(currentIdx, currentTurn) : undefined;
+    if (currentIdx === -1 || winner || gameLostFocus) return;
+      currentTurn !== null 
+        ? updateBoard(currentIdx, currentTurn)
+        : undefined;
       setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
     }
   );
@@ -56,9 +72,9 @@ export const FichaDropPreview = () => {
         { indeces.map( 
           (i) => (
             <Ficha
-              ref={fichaRefs[i]}
-              className={clsx({ 'invisible': i !== currentIdx || currentIdx === -1 })}
               key={i}
+              ref={ fichaRefs[i] ?? undefined }
+              className={clsx({ 'invisible': i !== currentIdx || currentIdx === -1 || gameLostFocus})}
               type={currentTurn}
             />
           )

@@ -2,33 +2,44 @@ import { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "dark" | "light" | "system"
 
-type ThemeProviderProps = {
+type SettingsProviderProps = {
   children: React.ReactNode
   defaultTheme?: Theme
   storageKey?: string
 }
 
-type ThemeProviderState = {
+type SettingsProviderState = {
   theme: Theme
   setTheme: (theme: Theme) => void
+  boardDimensions: {col: number, row: number}
+  setBoardDimensions: (dims: {col: number, row: number}) => void
+  connectionLength: number
+  setConnectionLength: (len: number) => void
 }
 
-const initialState: ThemeProviderState = {
+const initialState: SettingsProviderState = {
   theme: "system",
   setTheme: () => null,
+  boardDimensions: {col: 6, row: 6},
+  setBoardDimensions: () => null,
+  connectionLength: 4,
+  setConnectionLength: () => null
 }
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+const SettingsProviderContext = createContext<SettingsProviderState>(initialState)
 
-export function ThemeProvider({
+export function SettingsProvider({
   children,
   defaultTheme = "system",
   storageKey = "vite-ui-theme",
   ...props
-}: ThemeProviderProps) {
+}: SettingsProviderProps) {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   )
+
+  const [boardDimensions, setBoardDimensions] = useState({ row: 6, col: 6 })
+  const [connectionLength, setConnectionLength] = useState(4);
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -54,20 +65,24 @@ export function ThemeProvider({
       localStorage.setItem(storageKey, theme)
       setTheme(theme)
     },
+    boardDimensions,
+    setBoardDimensions,
+    connectionLength,
+    setConnectionLength
   }
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <SettingsProviderContext.Provider {...props} value={value}>
       {children}
-    </ThemeProviderContext.Provider>
+    </SettingsProviderContext.Provider>
   )
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext)
+export const useSettings = () => {
+  const context = useContext(SettingsProviderContext)
 
   if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider")
+    throw new Error("useSettings must be used within a SettingsProvider")
 
   return context
 }

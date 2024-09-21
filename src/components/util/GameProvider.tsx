@@ -1,5 +1,6 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { FichaColor } from "@/components/specific/Ficha";
+import { useSettings } from "@/components/util/SettingsProvider";
 
 interface GameContextValues {
    currentTurn: FichaColor;
@@ -7,27 +8,25 @@ interface GameContextValues {
    boardModel: FichaColor[][]
    updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void
    winner: FichaColor
+   gameLostFocus: boolean
+   setGameLostFocus: (lf: boolean) => void
 }
 
-interface GameContextProps {
-  children: React.ReactNode
-  winLineLength: number
-  boardDimensions: {
-    row: number,
-    col: number
-  }
-}
+interface GameContextProps { children: React.ReactNode };
 
 const GameContext = createContext<GameContextValues>({
   currentTurn: null,
   setCurrentTurn: () => {},
   winner: null,
   boardModel: Array(6).map(() => Array(6).fill(null)),
-  updateBoard: () => {}
+  updateBoard: () => {},
+  gameLostFocus: false,
+  setGameLostFocus: () => {},
 });
 
 export const GameProvider = (props: GameContextProps) => {
-  const { children, winLineLength, boardDimensions, ...otherProps} = props;
+  const { children, ...otherProps} = props;
+  const { boardDimensions, connectionLength } = useSettings();
 
   const [currentTurn, setCurrentTurn] = useState<FichaColor>('red');
   const [winner, setWinner] = useState<FichaColor>(null);
@@ -37,19 +36,29 @@ export const GameProvider = (props: GameContextProps) => {
   const [nextAvailableSlot, setNextAvailableSlot] = 
     useState<number[]>(boardModel[0].map((_) => boardDimensions.row - 1));
 
+  useEffect(
+    () => {
+      setBoardModel(
+        new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
+      );
+      setNextAvailableSlot(boardModel[0].map((_) => boardDimensions.row - 1));
+    },
+    [boardDimensions, connectionLength]
+  );
+
   const calculateWinner = () => {
-    const winsPerColumn = boardDimensions.col - winLineLength + 1;
-    const winsPerRow = boardDimensions.row - winLineLength + 1;
-    const winLineIdxs = Array.from({ length: winLineLength });
+    const winsPerColumn = boardDimensions.col - connectionLength + 1;
+    const winsPerRow = boardDimensions.row - connectionLength + 1;
+    const winLineIdxs = Array.from({ length: connectionLength });
 
     // check columns for wins
     const checkColumns = () => nextAvailableSlot
       .some((slot, c) => {
-        if (slot >= boardDimensions.row - winLineLength) return false;
+        if (slot >= boardDimensions.row - connectionLength) return false;
         const optIdxs = Array.from({ length: winsPerColumn});
 
         return optIdxs.some((_, piv) => boardModel[c]
-          .slice(winsPerColumn - piv - 1, winsPerColumn - piv - 1 + winLineLength)
+          .slice(winsPerColumn - piv - 1, winsPerColumn - piv - 1 + connectionLength)
           .every((ficha) => ficha === currentTurn));
       });
 
@@ -70,7 +79,7 @@ export const GameProvider = (props: GameContextProps) => {
 
     // check diagonals for wins
     const checkDiagonals = () => {
-      if (winLineLength > boardDimensions.row || winLineLength > boardDimensions.col)
+      if (connectionLength > boardDimensions.row || connectionLength > boardDimensions.col)
         return false;
       const optIdxs = {
         row: Array.from({ length: winsPerRow }),
@@ -107,12 +116,16 @@ export const GameProvider = (props: GameContextProps) => {
     calculateWinner();
   }
 
+  const [gameLostFocus, setGameLostFocus] = useState(false);
+
   const value = {
     currentTurn,
     setCurrentTurn,
     winner,
     boardModel,
-    updateBoard
+    updateBoard,
+    gameLostFocus,
+    setGameLostFocus
   };
 
   return (
@@ -128,7 +141,5 @@ export const useGame = () => {
   if (gameContext === undefined)
   throw new Error("useGame must be used within a GameProvider")
 
-
-  useEffect(() => console.log(gameContext.winner), [gameContext.winner]);
   return gameContext;
 };

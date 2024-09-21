@@ -2,35 +2,26 @@ import '@/App.css'
 import { Board } from '@/components/specific/Board';
 import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import WinnerSection from '@/components/specific/WinnerSection';
-import { ThemeProvider } from './components/util/ThemeProvider';
-import { ThemeToggle } from './components/util/ThemeToggle';
+import { SettingsProvider } from '@/components/util/SettingsProvider';
+import Settings from '@/components/specific/Settings';
 import { Card } from '@/components/ui/card';
 
 import { GameProvider } from '@/components/util/GameProvider';
-import { useState } from 'react';
 
-export const App = () => {
-  const [boardDimensions, _setBoardDimensions] = useState({ row: 6, col: 6 })
-  const [winLineLength, _setWinLineLength] = useState(4);
-
-  return (
-    <div>
-      <ThemeProvider storageKey='vite-ui-theme'>
-        <div className='text-6xl font-[700] italic mt-5 mb-20'>Connect Babo</div>
+export const App = () => (
+  <div>
+    <SettingsProvider storageKey='vite-ui-theme'>
+      <div className='text-6xl font-[700] italic mt-5 mb-20'>Connect Babo</div>
+      <GameProvider>
         <Card>
-          <GameProvider
-            boardDimensions={boardDimensions}
-            winLineLength={winLineLength}
-          >
-            <FichaDropPreview/>
-            <Board className='mx-20 mb-20'/>
-            <WinnerSection/>
-          </GameProvider>
+          <FichaDropPreview/>
+          <Board className='mx-20 mb-20'/>
+          <WinnerSection/>
         </Card>
-        <ThemeToggle className='fixed bottom-0 right-0 m-5'/>
-      </ThemeProvider>
-    </div>
-  );
-};
+        <Settings/>
+      </GameProvider>
+    </SettingsProvider>
+  </div>
+);
 
 export default App
