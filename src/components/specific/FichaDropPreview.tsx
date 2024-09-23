@@ -1,7 +1,13 @@
 import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
-import { createRef, MutableRefObject, useEffect, useMemo, useState } from "react";
-import { useMouseClick, useMousePosition } from "@/lib/utils";
+import {
+  createRef,
+  MutableRefObject,
+  useEffect,
+  useMemo,
+  useState,
+  MouseEventHandler
+} from "react";
 import { useGame } from "@/components/util/GameProvider";
 
 interface FichaDropPreviewProps {
@@ -38,42 +44,49 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     [fichaRefs]
   );
 
-  const mousePos = useMousePosition();
+  const onClick: MouseEventHandler<HTMLDivElement> = (_) => {
+  if (currentIdx === -1 || winner || gameLostFocus) return;
+    currentTurn !== null 
+      ? updateBoard(currentIdx, currentTurn)
+      : undefined;
+    setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
+  };
 
-  useEffect(() => {
-    if (!mousePos.x) return; 
-    if (winner) {
-      setCurrentIdx(-1);
-      return;
-    }
-    const leftMost = fichaArrayVerticalBounds?.[0];
-    const rigthMost = fichaArrayVerticalBounds?.[fichaArrayVerticalBounds.length - 1];
-    if (!leftMost || !rigthMost) return;
-    if (mousePos.x < leftMost.left || mousePos.x > rigthMost.right) setCurrentIdx(-1);
-
-    fichaArrayVerticalBounds.find((bounds, i) => {
-      if (!bounds) return false;
-      if (mousePos.x && mousePos.x >= bounds.left && mousePos.x <= bounds.right) {
-        setCurrentIdx(i);
-        return true;
+  const mouseEvents: {
+    in: MouseEventHandler<HTMLDivElement>,
+    out: MouseEventHandler<HTMLDivElement>
+  } = {
+    out: (_) => setCurrentIdx(-1),
+    in: ({ pageX }) => {
+      if (!pageX) return; 
+      if (winner) {
+        setCurrentIdx(-1);
+        return;
       }
-    })
-  }, [mousePos.x]);
+      const leftMost = fichaArrayVerticalBounds?.[0];
+      const rigthMost = fichaArrayVerticalBounds?.[fichaArrayVerticalBounds.length - 1];
+      if (!leftMost || !rigthMost) return;
+      if (pageX < leftMost.left || pageX > rigthMost.right) setCurrentIdx(-1);
 
-  useMouseClick((_) => {
-    if (currentIdx === -1 || winner || gameLostFocus) return;
-      currentTurn !== null 
-        ? updateBoard(currentIdx, currentTurn)
-        : undefined;
-      setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
+      fichaArrayVerticalBounds.find((bounds, i) => {
+        if (!bounds) return false;
+        if (pageX && pageX >= bounds.left && pageX <= bounds.right) {
+          setCurrentIdx(i);
+          return true;
+        }
+      })
     }
-  );
+  };
   
   return (
-    <div className={clsx({
-      [className]: className !== '',
-      ['grid grid-flow-col border-2 rounded-2xl']: true,
-      ['border-stone-800 hover:border-stone-500']: true
+    <div
+      onClick={ onClick }
+      onMouseOut={mouseEvents.out }
+      onMouseMove={ mouseEvents.in }
+      className={clsx({
+        [className]: className !== '',
+        ['grid grid-flow-col border-2 rounded-2xl']: true,
+        ['border-stone-800 hover:border-stone-500']: true
       })}
     >
       { indeces.map( 
