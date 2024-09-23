@@ -8,14 +8,14 @@ import { Card } from '@/components/ui/card';
 import { GameProvider } from '@/components/util/GameProvider';
 
 export const App = () => (
-  <div>
+  <div className='flex flex-col'>
     <SettingsProvider storageKey='vite-ui-theme'>
-      <div className='text-6xl font-[700] italic mt-5 mb-20'>Connect Babo</div>
       <GameProvider>
-        <Card className='size-fit'>
-          <Board className='mx-20'/>
-          <WinnerSection/>
+        <div className='text-6xl font-[700] italic mt-5 mb-20'>Connect Babo</div>
+        <Card className='h-[70vh]'>
+          <Board/>
         </Card>
+        <WinnerSection/>
         <Settings/>
       </GameProvider>
     </SettingsProvider>

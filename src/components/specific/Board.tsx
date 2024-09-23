@@ -1,7 +1,6 @@
 import Ficha from '@/components/specific/Ficha';
 import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import { useGame } from '@/components/util/GameProvider';
-import clsx from 'clsx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export const Board = ({ className = '' }: { className?: string }) => {
@@ -39,13 +38,10 @@ export const Board = ({ className = '' }: { className?: string }) => {
   return (
     <div
       ref={ containerRef }
-      className={clsx({
-        [className]: className,
-        ['w-[75vw] h-[65vh]']: true
-      })}
-    >          
-      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-5 gap-2'/>
-      <div className='size-fit grid grid-flow-col mx-auto mt-25 mb-auto gap-2'>
+      className='w-3/4 h-2/3 m-auto grid grid-flow-row'
+    >
+      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto gap-2 my-auto'/>
+      <div className='size-fit grid grid-flow-col mx-auto mb-auto gap-2'>
         { boardModel.map( (col, c) => (
           <div key={c} className='size-fit gap-2 grid grid-flow-rows'>
             {col.map((_row, r) =>

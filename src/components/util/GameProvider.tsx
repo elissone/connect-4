@@ -33,15 +33,16 @@ export const GameProvider = (props: GameContextProps) => {
   const [boardModel, setBoardModel] = useState<GameContextValues['boardModel']>(
     new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
   );
-  const [nextAvailableSlot, setNextAvailableSlot] = 
-    useState<number[]>(boardModel[0].map((_) => boardDimensions.row - 1));
+  const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(
+    boardModel[0].map((_) => boardDimensions.col - 1)
+  );
 
   useEffect(
     () => {
       setBoardModel(
         new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
       );
-      setNextAvailableSlot(boardModel[0].map((_) => boardDimensions.row - 1));
+      setNextAvailableSlot(boardModel[0].map((_) => boardDimensions.col - 1));
     },
     [boardDimensions, connectionLength]
   );
