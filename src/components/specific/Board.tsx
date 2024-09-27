@@ -3,7 +3,7 @@ import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import { useGame } from '@/components/util/GameProvider';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export const Board = ({ className = '' }: { className?: string }) => {
+export const Board = () => {
 
   const { boardModel } = useGame();
 
@@ -25,7 +25,7 @@ export const Board = ({ className = '' }: { className?: string }) => {
       return () => (containerRef.current) ? obs.unobserve(containerRef.current) : undefined
     }, 
     [containerRef]
-  );
+  ); 
 
   const fichaSize = useMemo(
     () => Math.min(

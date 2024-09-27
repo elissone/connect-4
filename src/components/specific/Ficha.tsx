@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ForwardedRef, Ref, forwardRef } from "react";
+import { ForwardedRef, MouseEventHandler, Ref, forwardRef } from "react";
 
 export type FichaColor = 'red' | 'yellow' | null;
 
@@ -9,12 +9,17 @@ interface FichaProps {
   border?: boolean
   className?: string
   refVal?: Ref<HTMLDivElement>
+  onClick?: MouseEventHandler<HTMLDivElement>
 }
 
-export const Ficha = forwardRef(({ size = 80, border = false, className, type }: FichaProps, ref: ForwardedRef<HTMLDivElement>) => {
+export const Ficha = forwardRef((
+  { size = 80, border = false, onClick, className, type }: FichaProps,
+  ref: ForwardedRef<HTMLDivElement>
+) => {
   return (
     <div
       ref={ref}
+      onClick={ onClick }
       style={{ width: size, height: size}}
       className={
         clsx(

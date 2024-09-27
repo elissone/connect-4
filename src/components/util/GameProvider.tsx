@@ -34,7 +34,7 @@ export const GameProvider = (props: GameContextProps) => {
     new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
   );
   const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(
-    boardModel[0].map((_) => boardDimensions.col - 1)
+    Array(boardDimensions.row).fill(boardDimensions.col - 1)
   );
 
   useEffect(
@@ -42,7 +42,7 @@ export const GameProvider = (props: GameContextProps) => {
       setBoardModel(
         new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
       );
-      setNextAvailableSlot(boardModel[0].map((_) => boardDimensions.col - 1));
+      setNextAvailableSlot(Array(boardDimensions.row).fill(boardDimensions.col - 1));
     },
     [boardDimensions, connectionLength]
   );
@@ -107,6 +107,7 @@ export const GameProvider = (props: GameContextProps) => {
   }
 
   const updateBoard: GameContextValues['updateBoard'] = (col: number, turn: Exclude<FichaColor, null>) => {
+    console.log('keloke', col, turn, nextAvailableSlot);
     const slot = nextAvailableSlot[col];
     if (slot == -1) return;
     boardModel[col][slot] = turn;
