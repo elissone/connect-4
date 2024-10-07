@@ -5,11 +5,14 @@ import { useSettings } from "@/components/util/SettingsProvider";
 interface GameContextValues {
    currentTurn: FichaColor;
    setCurrentTurn: (turn: FichaColor) => void;
-   boardModel: FichaColor[][]
-   updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void
-   winner: FichaColor
-   gameLostFocus: boolean
-   setGameLostFocus: (lf: boolean) => void
+   boardModel: FichaColor[][];
+   updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void;
+   winner: FichaColor;
+   gameLostFocus: boolean;
+   setGameLostFocus: (lf: boolean) => void;
+   justDroppedCol: number;
+   setJustDroppedCol: (col: number) => void;
+   nextAvailableSlot: number[];
 }
 
 interface GameContextProps { children: React.ReactNode };
@@ -22,6 +25,9 @@ const GameContext = createContext<GameContextValues>({
   updateBoard: () => {},
   gameLostFocus: false,
   setGameLostFocus: () => {},
+  justDroppedCol: -1,
+  setJustDroppedCol: () => {},
+  nextAvailableSlot: []
 });
 
 export const GameProvider = (props: GameContextProps) => {
@@ -36,6 +42,8 @@ export const GameProvider = (props: GameContextProps) => {
   const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(
     Array(boardDimensions.row).fill(boardDimensions.col - 1)
   );
+  const [justDroppedCol, setJustDroppedCol] = useState<number>(-1);
+  const [gameLostFocus, setGameLostFocus] = useState(false);
 
   useEffect(
     () => {
@@ -107,18 +115,24 @@ export const GameProvider = (props: GameContextProps) => {
   }
 
   const updateBoard: GameContextValues['updateBoard'] = (col: number, turn: Exclude<FichaColor, null>) => {
-    console.log('keloke', col, turn, nextAvailableSlot);
-    const slot = nextAvailableSlot[col];
-    if (slot == -1) return;
-    boardModel[col][slot] = turn;
-    nextAvailableSlot[col] --;
-    setBoardModel([...boardModel]);
-    setNextAvailableSlot([...nextAvailableSlot]);
+    console.log('im finna set the num to', col)
+    setJustDroppedCol(col);
 
-    calculateWinner();
+    const timeoutFunc = () => {
+      const slot = nextAvailableSlot[col];
+      if (slot == -1) return;
+      boardModel[col][slot] = turn;
+      nextAvailableSlot[col] --;
+      setBoardModel([...boardModel]);
+      setNextAvailableSlot([...nextAvailableSlot]);
+      setJustDroppedCol(-1);
+
+      calculateWinner();
+      setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
+    }
+
+    setTimeout(timeoutFunc, 400);
   }
-
-  const [gameLostFocus, setGameLostFocus] = useState(false);
 
   const value = {
     currentTurn,
@@ -127,7 +141,10 @@ export const GameProvider = (props: GameContextProps) => {
     boardModel,
     updateBoard,
     gameLostFocus,
-    setGameLostFocus
+    nextAvailableSlot,
+    setGameLostFocus,
+    justDroppedCol,
+    setJustDroppedCol
   };
 
   return (

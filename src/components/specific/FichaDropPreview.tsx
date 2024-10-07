@@ -9,14 +9,13 @@ interface FichaDropPreviewProps {
 }
 
 export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreviewProps) => {
-  const { winner, boardModel, updateBoard, currentTurn, setCurrentTurn, gameLostFocus }
+  const { winner, boardModel, updateBoard, currentTurn, gameLostFocus }
     = useGame();
 
   const handleClick = (e: MouseEvent) => {
     e.preventDefault();
     if (winner || gameLostFocus) return;
     if (currentTurn !== null) updateBoard(currentIdx, currentTurn);
-    setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
   };
   
   const [fichaMargin, setFichaMargin] = useState(0);

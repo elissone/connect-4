@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 export const Board = () => {
 
-  const { boardModel } = useGame();
+  const { boardModel, justDroppedCol, currentTurn, nextAvailableSlot } = useGame();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -35,25 +35,100 @@ export const Board = () => {
     [containerWidth, containerHeight, boardModel]
   );
 
-  return (
-    <div
-      ref={ containerRef }
-      className='w-3/4 h-2/3 m-auto grid grid-flow-row'
-    >
-      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto gap-2 my-auto'/>
-      <div className='size-fit grid grid-flow-col mx-auto mb-auto gap-2'>
-        { boardModel.map( (col, c) => (
-          <div key={c} className='size-fit gap-2 grid grid-flow-rows'>
-            {col.map((_row, r) =>
+  const getPaddingForFichaGrid = (c: number, r: number) => {
+    let [top, rgt, btm, lft] = [4, 4, 4, 4];
+
+    if (c == 0) lft = 0;
+    if (c == boardModel.length - 1) rgt = 0;
+    if (r == 0) top = 0;
+    if (r == boardModel[0].length - 1) btm = 0;
+
+    const result = `${top}px ${rgt}px ${btm}px ${lft}px`;
+    return result;
+  }
+  
+  const [fichaHideTop, setFichaTop] = useState(-fichaSize);
+  useEffect(() => {
+    // Delay the animation slightly to allow for a smooth initial render
+    if (justDroppedCol !== -1) {
+      setTimeout(() => {
+        setFichaTop(0);
+      }, 50); // Small delay to allow initial render
+    } else {
+      setFichaTop(-fichaSize);
+    }
+  }, [justDroppedCol, fichaSize]);
+
+  const fichaLeft = useMemo(
+    () => justDroppedCol < 0 ? 0 : (fichaSize + 8) * justDroppedCol,
+    [justDroppedCol, boardModel, fichaSize]
+  );
+
+  const fichaTop = useMemo(
+    () => justDroppedCol > 0
+      ? nextAvailableSlot[justDroppedCol] * (fichaSize + 8)
+      : 0,
+    [justDroppedCol, nextAvailableSlot, fichaSize]
+  );
+
+  useEffect(
+    () => console.log(fichaTop),
+    [fichaTop]
+  );
+
+  const BoardGrid = () => (
+    <div className='grid grid-flow-col z-1'>
+      { boardModel.map( (col, c) => (
+        <div key={c} className='size-fit grid grid-flow-rows'>
+          {col.map((_row, r) =>
+            // Make the outline clip in a parent div.
+            // Immitate 'gap-2' by dynamically setting the padding based off of the
+            // location of the column the ficha is in 
+            <div 
+              key={`${c}-${r}`}
+              style={{ overflow: 'clip', padding: getPaddingForFichaGrid(c, r) }}
+            >
               <Ficha
+                // Make a big outline that covers up a whole square. It will be clipped in a parent
+                className='outline outline-[100px] outline-background'
                 size={ fichaSize }
-                key={`${c}-${r}`}
                 border
                 type={boardModel[c][r]}
               />
-            )}
-          </div>
-        ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+
+  return (
+    <div
+      ref={ containerRef }
+      className='w-3/4 h-2/3 mx-auto my-0 flex flex-col'
+    >
+      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-auto'/>
+      <div className='relative inline-block size-fit mx-auto my-auto z-0'>
+        <div 
+          className='absolute inset-0 -z-10 overflow-clip'
+          style={{
+            transition: 'top 0.3s ease 0.1s',
+            top: `${fichaTop}px`,
+            opacity: justDroppedCol < 0 ? 0 : 1,
+          }}
+        >
+          <Ficha
+            type={ currentTurn }
+            size={ fichaSize }
+            style={{
+              position: 'absolute',
+              transition: 'top 0.1s ease',
+              left: `${fichaLeft}px`,
+              top: `${fichaHideTop}px`,
+            }}
+          />
+        </div>
+        <BoardGrid/>
       </div>
     </div>
   );

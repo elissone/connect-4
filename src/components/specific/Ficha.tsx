@@ -18,22 +18,28 @@ export const Ficha = forwardRef((
   ref: ForwardedRef<HTMLDivElement>
 ) => {
   return (
-    <div
-      ref={ref}
-      onClick={ onClick }
-      style={{...style,...{ width: size, height: size}}}
-      className={
-        clsx(
-          {
-            ['border-2']: border, 
-            ['h-20 w-20 rounded-full border-stone-500']: true,
-            ['bg-red-500']: type === 'red',
-            ['bg-yellow-500']: type === 'yellow',
-            [className ?? '']: !!className,
-          }
-        )
-      }
-    />
+    <div>
+      <div
+        ref={ref}
+        onClick={ onClick }
+        style={{
+          ...style,
+          width: size,
+          height: size,
+        }}
+        className={
+          clsx(
+            {
+              ['border-2']: border,
+              ['h-20 w-20 rounded-full border-stone-500']: true,
+              ['bg-red-500']: type === 'red',
+              ['bg-yellow-500']: type === 'yellow',
+              [className ?? '']: !!className,
+            }
+          )
+        }
+      />
+    </div>
   )
 });
 
