@@ -115,7 +115,6 @@ export const GameProvider = (props: GameContextProps) => {
   }
 
   const updateBoard: GameContextValues['updateBoard'] = (col: number, turn: Exclude<FichaColor, null>) => {
-    console.log('im finna set the num to', col)
     setJustDroppedCol(col);
 
     const timeoutFunc = () => {
@@ -131,7 +130,7 @@ export const GameProvider = (props: GameContextProps) => {
       setCurrentTurn(currentTurn === 'red' ? 'yellow' : 'red');
     }
 
-    setTimeout(timeoutFunc, 400);
+    setTimeout(timeoutFunc, 315);
   }
 
   const value = {

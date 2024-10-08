@@ -3,7 +3,9 @@ import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import { useGame } from '@/components/util/GameProvider';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export const Board = () => {
+type BoardProps = { className: string; };
+
+export const Board = ({ className }: BoardProps) => {
 
   const { boardModel, justDroppedCol, currentTurn, nextAvailableSlot } = useGame();
 
@@ -71,48 +73,17 @@ export const Board = () => {
     [justDroppedCol, nextAvailableSlot, fichaSize]
   );
 
-  useEffect(
-    () => console.log(fichaTop),
-    [fichaTop]
-  );
-
-  const BoardGrid = () => (
-    <div className='grid grid-flow-col z-1'>
-      { boardModel.map( (col, c) => (
-        <div key={c} className='size-fit grid grid-flow-rows'>
-          {col.map((_row, r) =>
-            // Make the outline clip in a parent div.
-            // Immitate 'gap-2' by dynamically setting the padding based off of the
-            // location of the column the ficha is in 
-            <div 
-              key={`${c}-${r}`}
-              style={{ overflow: 'clip', padding: getPaddingForFichaGrid(c, r) }}
-            >
-              <Ficha
-                // Make a big outline that covers up a whole square. It will be clipped in a parent
-                className='outline outline-[100px] outline-background'
-                size={ fichaSize }
-                border
-                type={boardModel[c][r]}
-              />
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-
   return (
     <div
       ref={ containerRef }
-      className='w-3/4 h-2/3 mx-auto my-0 flex flex-col'
+      className={ `${className} w-3/4 h-2/3 mx-auto my-0 flex flex-col` }
     >
-      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-auto'/>
-      <div className='relative inline-block size-fit mx-auto my-auto z-0'>
+      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-5'/>
+      <div className='relative size-fit mb-auto mt-0 mx-auto z-0'>
         <div 
           className='absolute inset-0 -z-10 overflow-clip'
           style={{
-            transition: 'top 0.3s ease 0.1s',
+            transition: 'top 0.2s ease 0.15s',
             top: `${fichaTop}px`,
             opacity: justDroppedCol < 0 ? 0 : 1,
           }}
@@ -128,7 +99,29 @@ export const Board = () => {
             }}
           />
         </div>
-        <BoardGrid/>
+        <div className='grid grid-flow-col z-1'>
+          { boardModel.map( (col, c) => (
+            <div key={c} className='size-fit grid grid-flow-rows'>
+              {col.map((_row, r) =>
+                // Make the outline clip in a parent div.
+                // Immitate 'gap-2' by dynamically setting the padding based off of the
+                // location of the column the ficha is in 
+                <div 
+                  key={`${c}-${r}`}
+                  style={{ overflow: 'clip', padding: getPaddingForFichaGrid(c, r) }}
+                >
+                  <Ficha
+                    // Make a big outline that covers up a whole square. It will be clipped in a parent
+                    className='outline outline-[100px] outline-background'
+                    size={ fichaSize }
+                    border
+                    type={boardModel[c][r]}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

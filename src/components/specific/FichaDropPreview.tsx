@@ -9,12 +9,12 @@ interface FichaDropPreviewProps {
 }
 
 export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreviewProps) => {
-  const { winner, boardModel, updateBoard, currentTurn, gameLostFocus }
+  const { winner, boardModel, updateBoard, currentTurn, gameLostFocus, justDroppedCol }
     = useGame();
 
   const handleClick = (e: MouseEvent) => {
     e.preventDefault();
-    if (winner || gameLostFocus) return;
+    if (winner || gameLostFocus || justDroppedCol >= 0) return;
     if (currentTurn !== null) updateBoard(currentIdx, currentTurn);
   };
   
@@ -47,6 +47,11 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     }
     setFichaMargin(pos);
   };
+
+  const fichaOpacity = useMemo(
+    () => (showFicha && justDroppedCol < 0) ? 1 : 0,
+    [showFicha, justDroppedCol]
+  );
   
   return (
     <div
@@ -68,7 +73,7 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
         style={{
           marginLeft: fichaMargin,
           marginRight: 'auto',
-          opacity: showFicha ? 1 : 0,
+          opacity: fichaOpacity,
           transition: 'margin 0.2s ease, opacity 0.2s ease, background-color 0.1s ease',
         }}
         size={ fichaSize }
