@@ -48,7 +48,8 @@ export const Board = ({ className }: BoardProps) => {
     const result = `${top}px ${rgt}px ${btm}px ${lft}px`;
     return result;
   }
-  
+
+  // Animate the first pop-out of the ficha
   const [fichaHideTop, setFichaTop] = useState(-fichaSize);
   useEffect(() => {
     // Delay the animation slightly to allow for a smooth initial render
@@ -61,13 +62,15 @@ export const Board = ({ className }: BoardProps) => {
     }
   }, [justDroppedCol, fichaSize]);
 
+  // For the positioning of the ficha depending on where it was dropped
   const fichaLeft = useMemo(
     () => justDroppedCol < 0 ? 0 : (fichaSize + 8) * justDroppedCol,
     [justDroppedCol, boardModel, fichaSize]
   );
 
+  // For the moving dropping animation
   const fichaTop = useMemo(
-    () => justDroppedCol > 0
+    () => justDroppedCol >= 0
       ? nextAvailableSlot[justDroppedCol] * (fichaSize + 8)
       : 0,
     [justDroppedCol, nextAvailableSlot, fichaSize]
