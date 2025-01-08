@@ -3,21 +3,25 @@ import { FichaColor } from "@/components/specific/Ficha";
 import { useSettings } from "@/components/util/SettingsProvider";
 
 interface GameContextValues {
-   currentTurn: FichaColor;
-   setCurrentTurn: (turn: FichaColor) => void;
-   boardModel: FichaColor[][];
-   updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void;
-   winner: FichaColor;
-   gameLostFocus: boolean;
-   setGameLostFocus: (lf: boolean) => void;
-   justDroppedCol: number;
-   setJustDroppedCol: (col: number) => void;
-   nextAvailableSlot: number[];
+  useMouse: boolean;
+  setUseMouse: (useMouse: boolean) => void;
+  currentTurn: FichaColor;
+  setCurrentTurn: (turn: FichaColor) => void;
+  boardModel: FichaColor[][];
+  updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void;
+  winner: FichaColor;
+  gameLostFocus: boolean;
+  setGameLostFocus: (lf: boolean) => void;
+  justDroppedCol: number;
+  setJustDroppedCol: (col: number) => void;
+  nextAvailableSlot: number[];
 }
 
 interface GameContextProps { children: React.ReactNode };
 
 const GameContext = createContext<GameContextValues>({
+  useMouse: true,
+  setUseMouse: () => {},
   currentTurn: null,
   setCurrentTurn: () => {},
   winner: null,
@@ -42,10 +46,11 @@ export const GameProvider = (props: GameContextProps) => {
 
   const [currentTurn, setCurrentTurn] = useState<FichaColor>('red');
   const [winner, setWinner] = useState<FichaColor>(null);
-  const [boardModel, setBoardModel] = useState<GameContextValues['boardModel']>(createCleanBoard());
+  const [boardModel, setBoardModel] = useState<FichaColor[][]>(createCleanBoard());
   const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(createCleanNextAvailableSlot());
   const [justDroppedCol, setJustDroppedCol] = useState<number>(-1);
   const [gameLostFocus, setGameLostFocus] = useState(false);
+  const [useMouse, setUseMouse] = useState(true);
   
   useEffect(
     () => {
@@ -138,7 +143,9 @@ export const GameProvider = (props: GameContextProps) => {
     nextAvailableSlot,
     setGameLostFocus,
     justDroppedCol,
-    setJustDroppedCol
+    setJustDroppedCol,
+    useMouse,
+    setUseMouse
   };
 
   return (

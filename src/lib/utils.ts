@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,7 +21,7 @@ export const useMousePosition = () => {
 
 type MouseClickHandler = (event: MouseEvent) => void;
 
-export function useMouseClick(handler: MouseClickHandler) {
+export const useMouseClick = (handler: MouseClickHandler) => {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       handler(event);
@@ -36,3 +36,50 @@ export function useMouseClick(handler: MouseClickHandler) {
     };
   }, [handler]); // Dependency array to ensure the effect is updated only when handler changes
 }
+
+type Key =
+| 'Backspace'
+| 'Tab'
+| 'Enter'
+| 'Shift'
+| 'Control'
+| 'Alt'
+| 'Pause'
+| 'CapsLock'
+| 'Escape'
+| 'Space'
+| 'PageUp'
+| 'PageDown'
+| 'End'
+| 'Home'
+| 'ArrowLeft'
+| 'ArrowUp'
+| 'ArrowRight'
+| 'ArrowDown'
+| 'Insert'
+| 'Delete'
+| '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+| 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j'
+| 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't'
+| 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+| 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'F6' | 'F7' | 'F8'
+| 'F9' | 'F10' | 'F11' | 'F12'
+| 'NumLock'
+| 'ScrollLock'
+| 'Meta';
+
+export const useKeyboardDown = (
+  keyHandlerMap: Partial<{ [key in Key]: () => void }>
+) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // cast the key since we already know it's a valid key by definition
+    const k = event.key as Key;
+    if (!keyHandlerMap[k]) return;
+    keyHandlerMap[k]();
+  }, [keyHandlerMap]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+};

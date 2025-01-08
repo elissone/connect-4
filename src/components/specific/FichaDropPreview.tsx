@@ -1,8 +1,9 @@
 import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
-import { MouseEvent, useState, useMemo } from "react";
+import { MouseEvent, useState, useMemo, useRef, useEffect } from "react";
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
+import { useKeyboardDown } from "@/lib/utils";
 
 interface FichaDropPreviewProps {
   className?: string;
@@ -10,33 +11,92 @@ interface FichaDropPreviewProps {
 }
 
 export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreviewProps) => {
-  const { winner, boardModel, updateBoard, currentTurn, gameLostFocus, justDroppedCol }
-    = useGame();
+  const { 
+    winner,
+    boardModel,
+    updateBoard,
+    currentTurn,
+    gameLostFocus,
+    justDroppedCol,
+    useMouse,
+    setUseMouse
+  } = useGame();
   const { boardDimensions } = useSettings();
 
-  const handleClick = (e: MouseEvent) => {
-    e.preventDefault();
+  const placeFicha = () => {
     if (winner || gameLostFocus || justDroppedCol >= 0) return;
     if (currentTurn !== null) updateBoard(currentIdx, currentTurn);
   };
   
-  const [fichaMargin, setFichaMargin] = useState(0);
-  const [currentDivWidth, setcurrentDivWidth] = useState(0);
-  const [showFicha, setShowFicha] = useState(false);
-  const currentIdx = useMemo(
-    () => fichaMargin === (currentDivWidth - fichaSize - 4)
-      ? boardDimensions.col - 1
-      : Math.floor(fichaMargin / (fichaSize + 8)),
-    [fichaMargin]
-  );
+  const handleClick = (e: MouseEvent) => {
+    e.preventDefault();
+    placeFicha();
+  };
+
+  const handleEnter = () => {
+    if (useMouse) return;
+    placeFicha();
+  };
   
+  const [fichaMargin, setFichaMargin] = useState(0);
+  const [showFicha, setShowFicha] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const shouldFichaShowAndMouseMode = (mouseOver: boolean) => {
+    if (mouseOver) setUseMouse(true);
+    setShowFicha(mouseOver || !useMouse);
+  };
+
+  const updateIdxAndMarginByNewIdx = (newIdx: number) => {
+    setCurrentIdx(newIdx);
+    const cappedIdx = Math.min(newIdx, boardDimensions.col - 2);
+    setFichaMargin(cappedIdx * (fichaSize + 8) + (
+      newIdx == boardDimensions.col - 1
+        ? fichaSize + 4
+        : 0
+    ));
+  };
+  
+  useEffect(() => {
+    if (currentIdx < boardDimensions.col) return;
+    updateIdxAndMarginByNewIdx(boardDimensions.col - 1);
+  }, [boardDimensions]);
+
+  const handleMoveFicha = (direction: 'left' | 'right') => {
+    if (useMouse) setUseMouse(false);
+    if (!showFicha) setShowFicha(true);
+    let newIdx = currentIdx;
+    switch (direction) {
+      case 'left':
+        if (currentIdx === 0) return;
+        newIdx = currentIdx - 1;
+        break;
+      case 'right':
+        if (currentIdx === boardDimensions.col - 1) return;
+        newIdx = currentIdx + 1;
+        break;
+    }
+    updateIdxAndMarginByNewIdx(newIdx);
+  }
+
+  useKeyboardDown({
+    'ArrowLeft': () => handleMoveFicha('left'),
+    'ArrowRight': () => handleMoveFicha('right'),
+    'a': () => handleMoveFicha('left'),
+    'd': () => handleMoveFicha('right'),
+    'ArrowDown': handleEnter,
+    'Enter': handleEnter,
+    'Space': handleEnter,
+    's': handleEnter
+  });
+
   // gap is 8 px
   const mouseOverFichasHandler = (e: MouseEvent) => {
     // things are devided by blocks the size of the fichas + the gapsize
     const mousePos = e.clientX - e.currentTarget.getBoundingClientRect().left;
-    setcurrentDivWidth(e.currentTarget.getBoundingClientRect().width);
     // account for the first and last items since they are special
     let pos = 0;
+    const currentDivWidth = e.currentTarget.getBoundingClientRect().width;
     if (mousePos < 0 || mousePos > currentDivWidth) return;
     if (mousePos > currentDivWidth - fichaSize) {
       // - 4px to account for the border
@@ -46,6 +106,11 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
       pos = idx * (fichaSize + 8);
     }
     setFichaMargin(pos);
+    setCurrentIdx(
+      fichaMargin === (currentDivWidth - fichaSize - 4)
+        ? boardDimensions.col - 1
+        : Math.floor(fichaMargin / (fichaSize + 8))
+    )
   };
 
   const fichaOpacity = useMemo(
@@ -62,12 +127,14 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
       className={clsx({
         [className]: className !== '',
         ['grid grid-flow-col border-2 rounded-2xl cursor-none']: true,
-        ['border-stone-800 hover:border-stone-500']: true
+        ['border-stone-800']: useMouse,
+        ['border-stone-500']: !useMouse,
+        ['hover:border-stone-500']: true,
       })}
       onMouseMove={ mouseOverFichasHandler }
       onClick={ handleClick }
-      onMouseEnter={ () => setShowFicha(true) }
-      onMouseLeave={ () => setShowFicha(false) }
+      onMouseEnter={ () => shouldFichaShowAndMouseMode(true) }
+      onMouseLeave={ () => shouldFichaShowAndMouseMode(false) }
     >
       <Ficha
         style={{
