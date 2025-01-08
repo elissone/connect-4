@@ -30,27 +30,27 @@ const GameContext = createContext<GameContextValues>({
   nextAvailableSlot: []
 });
 
+
 export const GameProvider = (props: GameContextProps) => {
   const { children, ...otherProps} = props;
   const { boardDimensions, connectionLength } = useSettings();
 
+  const createCleanBoard = () => new Array(boardDimensions.row).fill(null).map(
+    () => new Array(boardDimensions.col).fill(null)
+  );
+  const createCleanNextAvailableSlot = () => new Array(boardDimensions.row).fill(boardDimensions.col - 1);
+
   const [currentTurn, setCurrentTurn] = useState<FichaColor>('red');
   const [winner, setWinner] = useState<FichaColor>(null);
-  const [boardModel, setBoardModel] = useState<GameContextValues['boardModel']>(
-    new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
-  );
-  const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(
-    Array(boardDimensions.row).fill(boardDimensions.col - 1)
-  );
+  const [boardModel, setBoardModel] = useState<GameContextValues['boardModel']>(createCleanBoard());
+  const [nextAvailableSlot, setNextAvailableSlot] = useState<number[]>(createCleanNextAvailableSlot());
   const [justDroppedCol, setJustDroppedCol] = useState<number>(-1);
   const [gameLostFocus, setGameLostFocus] = useState(false);
-
+  
   useEffect(
     () => {
-      setBoardModel(
-        new Array(boardDimensions.row).fill(null).map(() => Array(boardDimensions.col).fill(null))
-      );
-      setNextAvailableSlot(Array(boardDimensions.row).fill(boardDimensions.col - 1));
+      setBoardModel(createCleanBoard());
+      setNextAvailableSlot(createCleanNextAvailableSlot());
     },
     [boardDimensions, connectionLength]
   );
@@ -105,13 +105,8 @@ export const GameProvider = (props: GameContextProps) => {
 
     const winComputes = [checkColumns, checkRows, checkDiagonals];
 
-    winComputes.some( (computeWin) => {
-      if (computeWin()) {
-        setWinner(currentTurn);
-        return true;
-      }
-      return false;
-    });
+    const win = winComputes.some( (computeWin) => computeWin());
+    if (win) setWinner(currentTurn);
   }
 
   const updateBoard: GameContextValues['updateBoard'] = (col: number, turn: Exclude<FichaColor, null>) => {
