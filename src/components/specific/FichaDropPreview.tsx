@@ -1,6 +1,6 @@
 import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
-import { MouseEvent, useState, useMemo, useRef, useEffect } from "react";
+import { MouseEvent, useState, useMemo, useEffect } from "react";
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
 import { useKeyboardDown } from "@/lib/utils";
