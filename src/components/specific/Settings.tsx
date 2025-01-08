@@ -28,7 +28,7 @@ export const SettingsDialog = () => {
     setConnectionLength,
   } = useSettings();
 
-  const { setGameLostFocus } = useGame();
+  const { setGameLostFocus, winner, setWinner } = useGame();
 
   const StyledLabel = ({ htmlFor, children }: { htmlFor: string, children: ReactNode }) => (
     <Label className='max-w-fit align-middle justify-self-end mr-4 ml-auto my-auto' htmlFor={ htmlFor }>
@@ -51,8 +51,10 @@ export const SettingsDialog = () => {
     </ToggleGroup>
   </>
 
-  const setDim = (axis: 'row' | 'col', e: React.ChangeEvent<HTMLInputElement>) => 
+  const setDim = (axis: 'row' | 'col', e: React.ChangeEvent<HTMLInputElement>) => {
+    if (winner) setWinner(null);
     setBoardDimensions({...boardDimensions, [axis]: parseInt(e.target.value, 10)});
+  }
 
   const minAxisLen = useMemo(
     () => ({

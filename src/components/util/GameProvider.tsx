@@ -7,9 +7,10 @@ interface GameContextValues {
   setUseMouse: (useMouse: boolean) => void;
   currentTurn: FichaColor;
   setCurrentTurn: (turn: FichaColor) => void;
+  winner: FichaColor;
+  setWinner: (winner: FichaColor | null) => void;
   boardModel: FichaColor[][];
   updateBoard: (col: number, turn: Exclude<FichaColor, null>) => void;
-  winner: FichaColor;
   gameLostFocus: boolean;
   setGameLostFocus: (lf: boolean) => void;
   justDroppedCol: number;
@@ -25,6 +26,7 @@ const GameContext = createContext<GameContextValues>({
   currentTurn: null,
   setCurrentTurn: () => {},
   winner: null,
+  setWinner: () => {},
   boardModel: Array(6).map(() => Array(6).fill(null)),
   updateBoard: () => {},
   gameLostFocus: false,
@@ -137,6 +139,7 @@ export const GameProvider = (props: GameContextProps) => {
     currentTurn,
     setCurrentTurn,
     winner,
+    setWinner,
     boardModel,
     updateBoard,
     gameLostFocus,
@@ -145,7 +148,7 @@ export const GameProvider = (props: GameContextProps) => {
     justDroppedCol,
     setJustDroppedCol,
     useMouse,
-    setUseMouse
+    setUseMouse,
   };
 
   return (

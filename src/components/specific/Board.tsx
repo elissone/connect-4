@@ -79,7 +79,7 @@ export const Board = ({ className }: BoardProps) => {
   return (
     <div
       ref={ containerRef }
-      className={ `${className} w-3/4 h-2/3 mx-auto my-0 flex flex-col` }
+      className={ `${className} w-full h-full mx-auto my-0 flex flex-col` }
     >
       <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-5'/>
       <div className='relative size-fit mb-auto mt-0 mx-auto z-0'>

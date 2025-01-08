@@ -83,3 +83,32 @@ export const useKeyboardDown = (
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 };
+
+// Shoutout chatgpt for this one
+export const useIsResizing = (debounceTime: number = 200) => {
+  const [isResizing, setIsResizing] = useState(false);
+
+  useEffect(() => {
+    let resizeTimeout: ReturnType<typeof setTimeout>;
+
+    const handleResize = () => {
+      if (!isResizing) {
+        setIsResizing(true);
+      }
+
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        setIsResizing(false);
+      }, debounceTime);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(resizeTimeout);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isResizing, debounceTime]);
+
+  return isResizing;
+};

@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { MouseEvent, useState, useMemo, useEffect } from "react";
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
-import { useKeyboardDown } from "@/lib/utils";
+import { useIsResizing, useKeyboardDown } from "@/lib/utils";
 
 interface FichaDropPreviewProps {
   className?: string;
@@ -58,9 +58,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   };
   
   useEffect(() => {
-    if (currentIdx < boardDimensions.col) return;
-    updateIdxAndMarginByNewIdx(boardDimensions.col - 1);
-  }, [boardDimensions]);
+    updateIdxAndMarginByNewIdx(Math.min(boardDimensions.col - 1, currentIdx));
+  }, [boardDimensions, fichaSize]);
 
   const handleMoveFicha = (direction: 'left' | 'right') => {
     if (useMouse) setUseMouse(false);
@@ -113,6 +112,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     )
   };
 
+  const isResizing = useIsResizing();
+
   const fichaOpacity = useMemo(
     () => (showFicha && justDroppedCol < 0) ? 1 : 0,
     [showFicha, justDroppedCol]
@@ -141,7 +142,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
           marginLeft: fichaMargin,
           marginRight: 'auto',
           opacity: fichaOpacity,
-          transition: 'margin 0.2s ease, opacity 0.2s ease, background-color 0.1s ease',
+          // Do not animate the ficha moving around (its margin) when resizing
+          transition: `${!isResizing ? 'margin 0.2s ease, ' : ''}opacity 0.2s ease, background-color 0.1s ease`,
         }}
         size={ fichaSize }
         type={currentTurn}
