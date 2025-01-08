@@ -49,7 +49,6 @@ export const GameProvider = (props: GameContextProps) => {
   
   useEffect(
     () => {
-      console.log('boardDimensions (col/row)', boardDimensions.col, boardDimensions.row);
       setBoardModel(createCleanBoard());
       setNextAvailableSlot(createCleanNextAvailableSlot());
     },
