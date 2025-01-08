@@ -2,6 +2,7 @@ import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
 import { MouseEvent, useState, useMemo } from "react";
 import { useGame } from "@/components/util/GameProvider";
+import { useSettings } from "@/components/util/SettingsProvider";
 
 interface FichaDropPreviewProps {
   className?: string;
@@ -11,6 +12,7 @@ interface FichaDropPreviewProps {
 export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreviewProps) => {
   const { winner, boardModel, updateBoard, currentTurn, gameLostFocus, justDroppedCol }
     = useGame();
+  const { boardDimensions } = useSettings();
 
   const handleClick = (e: MouseEvent) => {
     e.preventDefault();
@@ -22,11 +24,9 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   const [currentDivWidth, setcurrentDivWidth] = useState(0);
   const [showFicha, setShowFicha] = useState(false);
   const currentIdx = useMemo(
-    () => {
-      return fichaMargin === (currentDivWidth - fichaSize - 4)
-        ? boardModel[0].length - 1
-        : Math.floor(fichaMargin / (fichaSize + 8))
-      },
+    () => fichaMargin === (currentDivWidth - fichaSize - 4)
+      ? boardDimensions.col - 1
+      : Math.floor(fichaMargin / (fichaSize + 8)),
     [fichaMargin]
   );
   

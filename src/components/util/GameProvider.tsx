@@ -35,10 +35,10 @@ export const GameProvider = (props: GameContextProps) => {
   const { children, ...otherProps} = props;
   const { boardDimensions, connectionLength } = useSettings();
 
-  const createCleanBoard = () => new Array(boardDimensions.row).fill(null).map(
-    () => new Array(boardDimensions.col).fill(null)
+  const createCleanBoard = () => new Array(boardDimensions.col).fill(null).map(
+    () => new Array(boardDimensions.row).fill(null)
   );
-  const createCleanNextAvailableSlot = () => new Array(boardDimensions.row).fill(boardDimensions.col - 1);
+  const createCleanNextAvailableSlot = () => new Array(boardDimensions.col).fill(boardDimensions.row - 1);
 
   const [currentTurn, setCurrentTurn] = useState<FichaColor>('red');
   const [winner, setWinner] = useState<FichaColor>(null);
@@ -49,6 +49,7 @@ export const GameProvider = (props: GameContextProps) => {
   
   useEffect(
     () => {
+      console.log('boardDimensions (col/row)', boardDimensions.col, boardDimensions.row);
       setBoardModel(createCleanBoard());
       setNextAvailableSlot(createCleanNextAvailableSlot());
     },
