@@ -1,15 +1,15 @@
 import Ficha from '@/components/specific/Ficha';
 import FichaDropPreview from '@/components/specific/FichaDropPreview';
 import { useGame } from '@/components/util/GameProvider';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSettings } from '@/components/util/SettingsProvider';
 
-type BoardProps = { className: string; };
+type BoardProps = { className: string; containerRef: React.RefObject<HTMLDivElement | null> };
 
-export const Board = ({ className }: BoardProps) => {
+export const Board = ({ className, containerRef }: BoardProps) => {
 
   const { boardModel, justDroppedCol, currentTurn, nextAvailableSlot } = useGame();
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { boardDimensions, fichaSize, setFichaSize } = useSettings();
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
 
@@ -25,25 +25,31 @@ export const Board = ({ className }: BoardProps) => {
       if (containerRef.current) obs.observe(containerRef.current);
       // Cleanup the observer when the component unmounts
       return () => (containerRef.current) ? obs.unobserve(containerRef.current) : undefined
-    }, 
+    },
     [containerRef]
-  ); 
+  );
 
-  const fichaSize = useMemo(
-    () => Math.min(
-      containerWidth / boardModel.length,
-      ((containerHeight - 40) / (boardModel[0].length + 1))
-    ) - 8,
-    [containerWidth, containerHeight, boardModel]
+  useEffect(
+    () => setFichaSize(
+      Math.min(
+        // Width-Based
+        // cw - fichaGap / cols
+        (containerWidth - (8 * (boardDimensions.col - 1))) / boardDimensions.col,
+        // Height-Based
+        // (ch - fichaGap - topAndBottomGaps - PreviewBorder) / (rows + preview ficha)
+        ((containerHeight * 0.9) - (8 * (boardDimensions.row - 1)) - 40 - 4) / (boardDimensions.row + 1)
+      )
+    ),
+    [containerWidth, containerHeight, boardDimensions]
   );
 
   const getPaddingForFichaGrid = (c: number, r: number) => {
     let [top, rgt, btm, lft] = [4, 4, 4, 4];
 
     if (c == 0) lft = 0;
-    if (c == boardModel.length - 1) rgt = 0;
+    if (c == boardDimensions.col - 1) rgt = 0;
     if (r == 0) top = 0;
-    if (r == boardModel[0].length - 1) btm = 0;
+    if (r == boardDimensions.row - 1) btm = 0;
 
     const result = `${top}px ${rgt}px ${btm}px ${lft}px`;
     return result;
@@ -65,7 +71,7 @@ export const Board = ({ className }: BoardProps) => {
   // For the positioning of the ficha depending on where it was dropped
   const fichaLeft = useMemo(
     () => justDroppedCol < 0 ? 0 : (fichaSize + 8) * justDroppedCol,
-    [justDroppedCol, boardModel, fichaSize]
+    [justDroppedCol, fichaSize]
   );
 
   // For the moving dropping animation
@@ -77,12 +83,9 @@ export const Board = ({ className }: BoardProps) => {
   );
 
   return (
-    <div
-      ref={ containerRef }
-      className={ `${className} w-full h-full mx-auto my-0 flex flex-col` }
-    >
-      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit mx-auto my-5'/>
-      <div className='relative size-fit mb-auto mt-0 mx-auto z-0'>
+    <div className={ `${className} w-full h-fit flex flex-col gap-5 items-center` }>
+      <FichaDropPreview fichaSize={ fichaSize }  className='size-fit'/>
+      <div className='relative size-fit z-0'>
         <div 
           className='absolute inset-0 -z-10 overflow-clip'
           style={{
