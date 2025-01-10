@@ -60,9 +60,7 @@ export const Board = ({ className, containerRef }: BoardProps) => {
   useEffect(() => {
     // Delay the animation slightly to allow for a smooth initial render
     if (justDroppedCol !== -1) {
-      setTimeout(() => {
-        setFichaTop(0);
-      }, 50); // Small delay to allow initial render
+      setTimeout(() => setFichaTop(0), 50); // Small delay to allow initial render
     } else {
       setFichaTop(-fichaSize);
     }
