@@ -1,6 +1,6 @@
 import Ficha from "@/components/specific/Ficha";
 import clsx from "clsx";
-import { MouseEvent, useState, useMemo, useEffect } from "react";
+import { MouseEvent, useState, useMemo, useEffect, useRef } from "react";
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
 import { useIsResizing, useKeyboardDown } from "@/lib/utils";
@@ -56,6 +56,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
         : 0
     ));
   };
+
+  const useMouseTimer = useRef<Timer | null>(null);
   
   useEffect(() => {
     updateIdxAndMarginByNewIdx(Math.min(boardDimensions.col - 1, currentIdx));
@@ -64,6 +66,11 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   const handleMoveFicha = (direction: 'left' | 'right') => {
     setUseMouse(false);
     setShowFicha(true);
+
+    // Turn off mouuse mode after 3 seconds
+    // Clear the timer if it exists
+    if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
+    useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
     let newIdx = currentIdx;
     switch (direction) {
       case 'left':
