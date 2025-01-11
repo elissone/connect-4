@@ -43,8 +43,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   const [currentIdx, setCurrentIdx] = useState(0);
 
   const shouldFichaShowAndMouseMode = (mouseOver: boolean) => {
-    if (mouseOver) setUseMouse(true);
-    setShowFicha(mouseOver || !useMouse);
+    setUseMouse(!mouseOver);
+    setShowFicha(mouseOver);
   };
 
   const updateIdxAndMarginByNewIdx = (newIdx: number) => {
@@ -62,8 +62,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   }, [boardDimensions, fichaSize]);
 
   const handleMoveFicha = (direction: 'left' | 'right') => {
-    if (useMouse) setUseMouse(false);
-    if (!showFicha) setShowFicha(true);
+    setUseMouse(false);
+    setShowFicha(true);
     let newIdx = currentIdx;
     switch (direction) {
       case 'left':
