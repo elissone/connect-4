@@ -11,14 +11,14 @@ export const App = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   return (
-  <div className='h-full w-[90vw] m-auto flex flex-col items-center'>
+  <div className='h-[90vh] w-[90vw] m-auto flex items-center justify-center flex-col'>
     <SettingsProvider storageKey='vite-ui-theme'>
       <GameProvider>
         <div className='h-[10%] w-full flex items-center justify-center'>
           <h1 
-            className='transition-[font-size] duration-300 font-[700] text-primary italic whitespace-nowrap'
+            className='font-[700] text-primary italic whitespace-nowrap'
             style={{
-              fontSize: 'clamp(1px, min(7vw, 7vh), 3.75rem)',
+              fontSize: 'clamp(1px, min(10vw, 5vh), 3.75rem)',
               lineHeight: '1'
             }}>
             Connect Babo
