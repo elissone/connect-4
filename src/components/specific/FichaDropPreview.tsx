@@ -94,7 +94,7 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     'd': () => handleMoveFicha('right'),
     'ArrowDown': handleEnter,
     'Enter': handleEnter,
-    'Space': handleEnter,
+    ' ': handleEnter,
     's': handleEnter
   });
 

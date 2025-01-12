@@ -47,7 +47,7 @@ type Key =
   | 'Pause'
   | 'CapsLock'
   | 'Escape'
-  | 'Space'
+  | ' '
   | 'PageUp'
   | 'PageDown'
   | 'End'
@@ -73,6 +73,7 @@ export const useKeyboardDown = (
 ) => {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // cast the key since we already know it's a valid key by definition
+    console.log(event.key);
     const k = event.key as Key;
     if (!keyHandlerMap[k]) return;
     keyHandlerMap[k]();
