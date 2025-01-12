@@ -18,7 +18,11 @@ import { Input } from '@/components/ui/input';
 import { ReactNode, useMemo } from 'react';
 import { useGame } from "@/components/util/GameProvider";
 
-export const SettingsDialog = () => {
+interface SettingsDialogProps {
+  triggerClass?: string;
+}
+
+export const SettingsDialog = ({ triggerClass = '' }: SettingsDialogProps) => {
   const {
     setTheme,
     theme,
@@ -112,7 +116,7 @@ export const SettingsDialog = () => {
   return (
     // onClose, wait a little bit to re-enable game focus
     <Drawer onClose={ () => setTimeout(() => setGameLostFocus(false), 200) }>
-      <DrawerTrigger className='fixed bottom-0 right-0 m-5' asChild>
+      <DrawerTrigger className={ triggerClass } asChild>
         <Button variant="outline" size="icon" onClick={ () => setGameLostFocus(true) }>
           <Settings className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100"/>
         </Button>

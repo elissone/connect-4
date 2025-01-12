@@ -2,10 +2,9 @@ import '@/App.css'
 import { Board } from '@/components/specific/Board';
 import GameStats from '@/components/specific/GameStats';
 import { SettingsProvider } from '@/components/util/SettingsProvider';
-import Settings from '@/components/specific/Settings';
-
 import { GameProvider } from '@/components/util/GameProvider';
 import { useRef } from 'react';
+import ToolTip from '@/components/specific/ToolTip';
 
 export const App = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -28,7 +27,7 @@ export const App = () => {
           <Board className='' containerRef={containerRef}/>
           <GameStats/>
         </div>
-        <Settings/>
+        <ToolTip/>
         </GameProvider>
       </SettingsProvider>
     </div>

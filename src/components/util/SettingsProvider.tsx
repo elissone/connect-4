@@ -17,6 +17,8 @@ type SettingsProviderState = {
   setConnectionLength: (len: number) => void
   fichaSize: number
   setFichaSize: (size: number) => void
+  showControls: boolean
+  setShowControls: (show: boolean) => void
 }
 
 const initialState: SettingsProviderState = {
@@ -27,7 +29,9 @@ const initialState: SettingsProviderState = {
   connectionLength: 4,
   setConnectionLength: () => null,
   fichaSize: 0,
-  setFichaSize: () => null
+  setFichaSize: () => null,
+  showControls: false,
+  setShowControls: () => null
 }
 
 const SettingsProviderContext = createContext<SettingsProviderState>(initialState)
@@ -45,6 +49,7 @@ export function SettingsProvider({
   const [boardDimensions, setBoardDimensions] = useState({ row: 6, col: 6 })
   const [connectionLength, setConnectionLength] = useState(4);
   const [fichaSize, setFichaSize] = useState(0);
+  const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -75,7 +80,9 @@ export function SettingsProvider({
     connectionLength,
     setConnectionLength,
     fichaSize,
-    setFichaSize
+    setFichaSize,
+    showControls,
+    setShowControls
   }
 
   return (
