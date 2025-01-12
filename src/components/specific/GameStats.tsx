@@ -1,6 +1,6 @@
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Ficha, FichaColor } from "@/components/specific/Ficha";
 import { ArrowDown, ArrowLeft, ArrowRight, Space, CornerDownLeft as Enter } from "lucide-react";
 
@@ -14,24 +14,14 @@ const WinnerSection = ({ winner }: { winner: FichaColor }) => (
 const ControlsSection = ({ showControls }: { showControls: boolean }) => {
   const fontSizeVal = 'min(4vw, 1.5vh)';
   const controlsClasses = 'mx-1 text-stone-300 bg-stone-700 rounded-md px-1';
-
-  const [controlOpacity, setControlOpacity] = useState(0);
-  const controlOpacityTimeout = useRef<Timer | null>(null);
-
-  useEffect(() => {
-    setControlOpacity(1);
-    if (controlOpacityTimeout.current) clearTimeout(controlOpacityTimeout.current);
-    controlOpacityTimeout.current = setTimeout(() => setControlOpacity(0), 2000);
-  }, [showControls]);
-
   return (
     <div 
       className="select-none flex items-center flex-col"
       style={{
         gap: 'min(1vw, 0.5vh)',
         fontSize: fontSizeVal,
-        opacity: controlOpacity,
         transition: 'opacity 0.5s ease-in-out',
+        opacity: showControls ? 1 : 0,
       }}>
       <div>
         <span className={controlsClasses}>
@@ -67,8 +57,19 @@ export const GameStats = () => {
     [fichaSize, boardDimensions]
   );
 
+  const [showControlsDelayed, setShowControlsDelayed] = useState(false);
+  const showControlsTimeout = useRef<Timer | null>(null);
+
+  useEffect(() => {
+    if (showControls) setShowControlsDelayed(true);
+    else {
+      if (showControlsTimeout.current) clearTimeout(showControlsTimeout.current);
+      showControlsTimeout.current = setTimeout(() => setShowControlsDelayed(true), 500);
+    }
+  }, [showControls]);
+
   const showContent = useMemo(
-    () => Boolean(winner) || showControls,
+    () => Boolean(winner) || showControlsDelayed,
     [winner, showControls]
   );
 
@@ -83,7 +84,7 @@ export const GameStats = () => {
       }}
     >
       { winner && <WinnerSection winner={winner}/> }
-      { showControls && <ControlsSection showControls={showControls}/> }
+      { !winner && showControlsDelayed && <ControlsSection showControls={showControls}/>}
     </div>
   );
 };
