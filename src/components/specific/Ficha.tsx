@@ -5,7 +5,7 @@ export type FichaColor = 'red' | 'yellow' | null;
 
 interface FichaProps {
   type: FichaColor
-  size?: number
+  size?: CSSProperties['width'] | CSSProperties['height']
   border?: boolean
   style?: CSSProperties
   className?: string
@@ -27,17 +27,13 @@ export const Ficha = forwardRef((
           width: size,
           height: size,
         }}
-        className={
-          clsx(
-            {
-              ['border-2']: border,
-              ['h-20 w-20 rounded-full border-stone-500']: true,
-              ['bg-red-500']: type === 'red',
-              ['bg-yellow-500']: type === 'yellow',
-              [className ?? '']: !!className,
-            }
-          )
-        }
+        className={clsx({
+          ['border-2']: border,
+          ['h-20 w-20 rounded-full border-stone-500']: true,
+          ['bg-red-500']: type === 'red',
+          ['bg-yellow-500']: type === 'yellow',
+          [className ?? '']: !!className,
+        })}
       />
     </div>
   )

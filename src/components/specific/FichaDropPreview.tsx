@@ -35,6 +35,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
 
   const handleEnter = () => {
     if (useMouse) return;
+    if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
+    useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
     placeFicha();
   };
   

@@ -1,6 +1,6 @@
 import '@/App.css'
 import { Board } from '@/components/specific/Board';
-import WinnerSection from '@/components/specific/WinnerSection';
+import GameStats from '@/components/specific/GameStats';
 import { SettingsProvider } from '@/components/util/SettingsProvider';
 import Settings from '@/components/specific/Settings';
 
@@ -26,7 +26,7 @@ export const App = () => {
         </div>
         <div ref={containerRef} className='h-[90%] w-full flex flex-col gap-5 items-center'>
           <Board className='' containerRef={containerRef}/>
-          <WinnerSection/>
+          <GameStats/>
         </div>
         <Settings/>
         </GameProvider>
