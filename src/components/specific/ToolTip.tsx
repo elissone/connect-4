@@ -12,7 +12,7 @@ export const ToolTip = () => {
   const showAndThenHideControls = () => {
     setShowControls(true);
     if (showControlsTimeout.current) clearTimeout(showControlsTimeout.current);
-    showControlsTimeout.current = setTimeout(() => setShowControls(false), 2000);
+    showControlsTimeout.current = setTimeout(() => setShowControls(false), 2500);
   }
 
   return (

@@ -1,7 +1,8 @@
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
-import { useMemo } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Ficha, FichaColor } from "@/components/specific/Ficha";
+import { ArrowDown, ArrowLeft, ArrowRight, Space, CornerDownLeft as Enter } from "lucide-react";
 
 const WinnerSection = ({ winner }: { winner: FichaColor }) => (
   <div className="flex items-center gap-3">
@@ -10,10 +11,49 @@ const WinnerSection = ({ winner }: { winner: FichaColor }) => (
   </div>
 );
 
-const ControlsSection = () => {
+const ControlsSection = ({ showControls }: { showControls: boolean }) => {
+  const fontSizeVal = 'min(4vw, 1.5vh)';
+  const controlsClasses = 'mx-1 text-stone-300 bg-stone-700 rounded-md px-1';
+
+  const [controlOpacity, setControlOpacity] = useState(0);
+  const controlOpacityTimeout = useRef<Timer | null>(null);
+
+  useEffect(() => {
+    setControlOpacity(1);
+    if (controlOpacityTimeout.current) clearTimeout(controlOpacityTimeout.current);
+    controlOpacityTimeout.current = setTimeout(() => setControlOpacity(0), 2000);
+  }, [showControls]);
+
   return (
-    <div className="flex items-center">
-      <p>This is the controls section</p>
+    <div 
+      className="select-none flex items-center flex-col"
+      style={{
+        gap: 'min(1vw, 0.5vh)',
+        fontSize: fontSizeVal,
+        opacity: controlOpacity,
+        transition: 'opacity 0.5s ease-in-out',
+      }}>
+      <div>
+        <span className={controlsClasses}>
+          <ArrowLeft  className="w-fit inline aspect-square" style={{ height: fontSizeVal }}/>,
+          <ArrowRight className="w-fit inline aspect-square" style={{ height: fontSizeVal }}/>,
+          A, D, 
+        </span>
+        or
+        <span className={controlsClasses}>
+          Mouse Hover
+        </span>
+        over board to move the <span className="text-stone-300 italic">Ficha</span>
+      </div>
+      <div>
+        <span className={controlsClasses}>
+          <Enter className="w-fit inline aspect-square" style={{ height: fontSizeVal }}/>,
+          <Space className="w-fit inline aspect-square" style={{ height: fontSizeVal }}/>,
+          <ArrowDown className="w-fit inline aspect-square" style={{ height: fontSizeVal }}/>,
+          S
+        </span>
+        to set it
+      </div>
     </div>
   )
 }
@@ -43,7 +83,7 @@ export const GameStats = () => {
       }}
     >
       { winner && <WinnerSection winner={winner}/> }
-      { showControls && <ControlsSection/> }
+      { showControls && <ControlsSection showControls={showControls}/> }
     </div>
   );
 };
