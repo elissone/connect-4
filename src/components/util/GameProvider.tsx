@@ -46,6 +46,13 @@ export const GameProvider = (props: GameContextProps) => {
   );
   const createCleanNextAvailableSlot = () => new Array(boardDimensions.col).fill(boardDimensions.row - 1);
 
+  const resetGame = () => {
+    setBoardModel(createCleanBoard());
+    setNextAvailableSlot(createCleanNextAvailableSlot());
+    setWinner(null);
+    setCurrentTurn('red');
+  }
+
   const [currentTurn, setCurrentTurn] = useState<FichaColor>('red');
   const [winner, setWinner] = useState<FichaColor>(null);
   const [boardModel, setBoardModel] = useState<FichaColor[][]>(createCleanBoard());
@@ -54,13 +61,7 @@ export const GameProvider = (props: GameContextProps) => {
   const [gameLostFocus, setGameLostFocus] = useState(false);
   const [useMouse, setUseMouse] = useState(true);
   
-  useEffect(
-    () => {
-      setBoardModel(createCleanBoard());
-      setNextAvailableSlot(createCleanNextAvailableSlot());
-    },
-    [boardDimensions, connectionLength]
-  );
+  useEffect(resetGame, [boardDimensions, connectionLength]);
 
   const calculateWinner = () => {
     const winsPerColumn = boardDimensions.col - connectionLength + 1;
