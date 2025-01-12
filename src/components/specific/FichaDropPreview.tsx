@@ -60,6 +60,13 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   };
 
   const useMouseTimer = useRef<Timer | null>(null);
+
+  const timeOutLogic = () => {
+    // Turn off mouuse mode after 3 seconds
+    // Clear the timer if it exists
+    if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
+    useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
+  }
   
   useEffect(() => {
     updateIdxAndMarginByNewIdx(Math.min(boardDimensions.col - 1, currentIdx));
@@ -68,11 +75,7 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   const handleMoveFicha = (direction: 'left' | 'right') => {
     setUseMouse(false);
     setShowFicha(true);
-
-    // Turn off mouuse mode after 3 seconds
-    // Clear the timer if it exists
-    if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
-    useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
+    timeOutLogic();
     let newIdx = currentIdx;
     switch (direction) {
       case 'left':
@@ -88,6 +91,8 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   }
 
   useKeyboardDown({
+    'ArrowUp': () => [setUseMouse(false), setShowFicha(true), timeOutLogic()],
+    'w': () => [setUseMouse(false), setShowFicha(true), timeOutLogic()],
     'ArrowLeft': () => handleMoveFicha('left'),
     'ArrowRight': () => handleMoveFicha('right'),
     'a': () => handleMoveFicha('left'),
