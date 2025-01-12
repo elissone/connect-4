@@ -32,13 +32,6 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     e.preventDefault();
     placeFicha();
   };
-
-  const handleEnter = () => {
-    if (useMouse) return;
-    if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
-    useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
-    placeFicha();
-  };
   
   const [fichaMargin, setFichaMargin] = useState(0);
   const [showFicha, setShowFicha] = useState(false);
@@ -67,6 +60,12 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
     if (useMouseTimer.current) clearTimeout(useMouseTimer.current);
     useMouseTimer.current = setTimeout(() => [setUseMouse(true), setShowFicha(false)], 2000);
   }
+
+  const handleEnter = () => {
+    if (useMouse) return;
+    timeOutLogic();
+    placeFicha();
+  };
   
   useEffect(() => {
     updateIdxAndMarginByNewIdx(Math.min(boardDimensions.col - 1, currentIdx));
@@ -91,12 +90,16 @@ export const FichaDropPreview = ({ fichaSize, className = '' }: FichaDropPreview
   }
 
   useKeyboardDown({
+    // Up
     'ArrowUp': () => [setUseMouse(false), setShowFicha(true), timeOutLogic()],
     'w': () => [setUseMouse(false), setShowFicha(true), timeOutLogic()],
+    // Left
     'ArrowLeft': () => handleMoveFicha('left'),
-    'ArrowRight': () => handleMoveFicha('right'),
     'a': () => handleMoveFicha('left'),
+    // Right
+    'ArrowRight': () => handleMoveFicha('right'),
     'd': () => handleMoveFicha('right'),
+    // Down
     'ArrowDown': handleEnter,
     'Enter': handleEnter,
     ' ': handleEnter,
