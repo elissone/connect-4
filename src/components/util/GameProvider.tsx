@@ -16,6 +16,7 @@ interface GameContextValues {
   justDroppedCol: number;
   setJustDroppedCol: (col: number) => void;
   nextAvailableSlot: number[];
+  resetGame: () => void;
 }
 
 interface GameContextProps { children: React.ReactNode };
@@ -33,7 +34,8 @@ const GameContext = createContext<GameContextValues>({
   setGameLostFocus: () => {},
   justDroppedCol: -1,
   setJustDroppedCol: () => {},
-  nextAvailableSlot: []
+  nextAvailableSlot: [],
+  resetGame: () => {}
 });
 
 
@@ -150,6 +152,7 @@ export const GameProvider = (props: GameContextProps) => {
     setJustDroppedCol,
     useMouse,
     setUseMouse,
+    resetGame
   };
 
   return (
