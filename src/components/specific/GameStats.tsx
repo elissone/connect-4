@@ -2,14 +2,33 @@ import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Ficha, FichaColor } from "@/components/specific/Ficha";
-import { ArrowDown, ArrowLeft, ArrowRight, Space, CornerDownLeft as Enter } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  CornerDownLeft as Enter,
+  RefreshCcw,
+  Space,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const WinnerSection = ({ winner }: { winner: FichaColor }) => (
-  <div className="flex items-center gap-3">
-    <Ficha type={winner} size="min(7vw, 2vh)" />
-    <h2 className="leading-none select-none" style={{ fontSize: 'min(7vw, 2vh)' }}>{winner} wins!</h2>
-  </div>
-);
+const WinnerSection = (props: { winner: FichaColor, resetGame: () => void }) => {
+  const { winner, resetGame } = props;
+  return (
+    <div className="flex items-center gap-3">
+      <Ficha type={winner} size="min(7vw, 2vh)" />
+      <h2 className="leading-none select-none" style={{ fontSize: 'min(7vw, 2vh)' }}>{winner} wins!</h2>
+      <Button 
+        onClick={resetGame} 
+        variant='outline'
+        size='icon'
+        style={{ height: 'min(7vw, 2vh)', width: 'min(7vw, 2vh)' }}
+      >
+        <RefreshCcw className="aspect-square" style={{ height: 'min(5vw, 1.3vh)' }}/>
+      </Button>
+    </div>
+  );
+};
 
 const ControlsSection = ({ showControls }: { showControls: boolean }) => {
   const fontSizeVal = 'min(4vw, 1.5vh)';
@@ -49,7 +68,7 @@ const ControlsSection = ({ showControls }: { showControls: boolean }) => {
 }
 
 export const GameStats = () => {
-  const { winner } = useGame();
+  const { winner, resetGame } = useGame();
   const { fichaSize, boardDimensions, showControls } = useSettings();
 
   const width = useMemo(
@@ -83,7 +102,7 @@ export const GameStats = () => {
         transition: 'opacity 0.5s ease-in-out',
       }}
     >
-      { winner && <WinnerSection winner={winner}/> }
+      { winner && <WinnerSection winner={winner} resetGame={resetGame}/> }
       { !winner && showControlsDelayed && <ControlsSection showControls={showControls}/>}
     </div>
   );

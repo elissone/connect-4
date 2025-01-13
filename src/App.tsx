@@ -28,7 +28,7 @@ export const App = () => {
             <GameStats/>
           </div>
           <BottomRightTools/>
-          </GameProvider>
+        </GameProvider>
       </SettingsProvider>
     </div>
   );
