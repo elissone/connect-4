@@ -1,6 +1,6 @@
 import { useGame } from "@/components/util/GameProvider";
 import { useSettings } from "@/components/util/SettingsProvider";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { Ficha, FichaColor } from "@/components/specific/Ficha";
 import {
   ArrowDown,
@@ -11,28 +11,40 @@ import {
   Space,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDelayedBoolState } from "@/lib/utils";
 
-const WinnerSection = (props: { winner: FichaColor, resetGame: () => void }) => {
-  const { winner, resetGame } = props;
+const WinnerSection: React.FC<{ style: React.CSSProperties, winner: FichaColor, resetGame: () => void }> = (props) => {
+  const { style, winner, resetGame } = props;
   return (
-    <div className="flex items-center gap-3">
-      <Ficha type={winner} size="min(7vw, 2vh)" />
-      <h2 className="leading-none select-none" style={{ fontSize: 'min(7vw, 2vh)' }}>{winner} wins!</h2>
-      <Button 
-        onClick={resetGame} 
-        variant='outline'
-        size='icon'
-        style={{ height: 'min(7vw, 2vh)', width: 'min(7vw, 2vh)' }}
-      >
-        <RefreshCcw className="aspect-square" style={{ height: 'min(5vw, 1.3vh)' }}/>
-      </Button>
+    <div 
+      className="size-full opacity-0 rounded-2xl border-stone-500 flex flex-col items-center justify-center"
+      style={{
+        borderWidth: winner ? '2px' : '0',
+        transition: 'opacity 0.5s ease-in-out',
+        ...style,
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <Ficha type={winner} size="min(7vw, 2vh)" />
+        <h2 className="leading-none select-none" style={{ fontSize: 'min(7vw, 2vh)' }}>{winner} wins!</h2>
+        <Button 
+          onClick={resetGame} 
+          variant='outline'
+          size='icon'
+          style={{ height: 'min(7vw, 2vh)', width: 'min(7vw, 2vh)' }}
+        >
+          <RefreshCcw className="aspect-square" style={{ height: 'min(5vw, 1.3vh)' }}/>
+        </Button>
+      </div>
     </div>
   );
 };
 
-const ControlsSection = ({ showControls }: { showControls: boolean }) => {
+const ControlsSection: React.FC<{ style: React.CSSProperties }> = (props) => {
+  const { style } = props;
   const fontSizeVal = 'min(4vw, 1.5vh)';
   const controlsClasses = 'mx-1 text-stone-300 bg-stone-700 rounded-md px-1';
+
   return (
     <div 
       className="select-none flex items-center flex-col"
@@ -40,7 +52,7 @@ const ControlsSection = ({ showControls }: { showControls: boolean }) => {
         gap: 'min(1vw, 0.5vh)',
         fontSize: fontSizeVal,
         transition: 'opacity 0.5s ease-in-out',
-        opacity: showControls ? 1 : 0,
+        ...style,
       }}>
       <div>
         <span className={controlsClasses}>
@@ -67,7 +79,7 @@ const ControlsSection = ({ showControls }: { showControls: boolean }) => {
   )
 }
 
-export const GameStats = () => {
+export const GameStats: React.FC = () => {
   const { winner, resetGame } = useGame();
   const { fichaSize, boardDimensions, showControls } = useSettings();
 
@@ -76,34 +88,25 @@ export const GameStats = () => {
     [fichaSize, boardDimensions]
   );
 
-  const [showControlsDelayed, setShowControlsDelayed] = useState(false);
-  const showControlsTimeout = useRef<Timer | null>(null);
+  /* Delay show controlls out to include animations */ 
+  const _showControlsDelayedOut = useDelayedBoolState(showControls, {in: 0, out: 1050});
+  const showControlsDelayedOut = useMemo(() => !winner && _showControlsDelayedOut, [winner, _showControlsDelayedOut]);
+  /* Delay show controlls in to make sure opacity starts at 0 */
+  const showControlsDelayedIn = useDelayedBoolState(showControls, {in: 50, out: 0});
 
-  useEffect(() => {
-    if (showControls) setShowControlsDelayed(true);
-    else {
-      if (showControlsTimeout.current) clearTimeout(showControlsTimeout.current);
-      showControlsTimeout.current = setTimeout(() => setShowControlsDelayed(true), 500);
-    }
-  }, [showControls]);
-
-  const showContent = useMemo(
-    () => Boolean(winner) || showControlsDelayed,
-    [winner, showControls]
+  /* Delay show winner in to make sure opacity starts at 0 */
+  const winnerDelayedIn = useDelayedBoolState(
+    useMemo(() => winner !== null, [winner]), 
+    { in: 50 }
   );
 
   return (
     <div
-      className="rounded-2xl border-stone-500 h-[10%] flex flex-col items-center justify-center"
-      style={{
-        width: `${width}px`,
-        borderWidth: winner ? '2px' : '0',
-        opacity: showContent ? 1 : 0,
-        transition: 'opacity 0.5s ease-in-out',
-      }}
+      className="h-[10%] flex flex-col items-center justify-center"
+      style={{ width: `${width}px` }}
     >
-      { winner && <WinnerSection winner={winner} resetGame={resetGame}/> }
-      { !winner && showControlsDelayed && <ControlsSection showControls={showControls}/>}
+      { winner && <WinnerSection style={{ opacity: winnerDelayedIn ? 1 : 0 }} winner={winner} resetGame={resetGame}/> }
+      { showControlsDelayedOut && <ControlsSection style={{ opacity: showControlsDelayedIn ? 1 : 0 }}/> }
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -73,7 +73,6 @@ export const useKeyboardDown = (
 ) => {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // cast the key since we already know it's a valid key by definition
-    console.log(event.key);
     const k = event.key as Key;
     if (!keyHandlerMap[k]) return;
     keyHandlerMap[k]();
@@ -112,4 +111,26 @@ export const useIsResizing = (debounceTime: number = 200) => {
   }, [isResizing, debounceTime]);
 
   return isResizing;
+};
+
+export const useDelayedBoolState = (
+  value: boolean, 
+  delay: {in?: number, out?: number} = {in: 0, out: 0}
+) => {
+  const [state, setState] = useState(false);
+  const timerIn = useRef<Timer | null>(null);
+  const timerOut = useRef<Timer | null>(null);
+  useEffect(() => {
+    if (timerIn.current) clearTimeout(timerIn.current);
+    if (timerOut.current) clearTimeout(timerOut.current);
+    const timer = value ? timerIn : timerOut;
+    timer.current = setTimeout(() => setState(value), delay[value ? 'in' : 'out'] ?? 0);
+    // Cleanup function to clear the timer on unmount or value change
+    return () => {
+      if (timerIn.current) clearTimeout(timerIn.current);
+      if (timerOut.current) clearTimeout(timerOut.current);
+    };
+  }, [value, delay]);
+
+  return state;
 };
